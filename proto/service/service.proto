@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package service;
+
+option go_package = "github.com/fahrillrizal/ecommerce-grpc/pb/service";
+
+import "common/base_response.proto";
+import "buf/validate/validate.proto";
+
+service HelloworldService {
+  rpc SayHello (HelloRequest) returns (HelloResponse);
+}
+
+message HelloRequest {
+  string name = 1[(buf.validate.field).string = {min_len: 1}];
+}
+
+message HelloResponse {
+  common.BaseResponse base = 1;
+  string message = 2;
+}

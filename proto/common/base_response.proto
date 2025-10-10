@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package common;
+
+option go_package = "github.com/fahrillrizal/ecommerce-grpc/pb/common";
+
+message ValidationError {
+    string field = 1;
+    string message = 2;
+}
+
+message BaseResponse {
+    int32 status_code = 1;
+    string message = 2;
+    bool is_error = 3;
+    repeated ValidationError validation_errors = 4;
+}
