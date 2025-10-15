@@ -10,7 +10,9 @@ import (
 	"github.com/fahrillrizal/ecommerce-grpc/internal/handler"
 	"github.com/fahrillrizal/ecommerce-grpc/internal/repositories"
 	"github.com/fahrillrizal/ecommerce-grpc/internal/services"
+	"github.com/fahrillrizal/ecommerce-grpc/internal/utils"
 	"github.com/fahrillrizal/ecommerce-grpc/pb/auth"
+	"github.com/fahrillrizal/ecommerce-grpc/pb/product"
 	"github.com/fahrillrizal/ecommerce-grpc/pkg/database"
 	"github.com/fahrillrizal/ecommerce-grpc/pkg/middleware"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
@@ -36,6 +38,15 @@ func main() {
 	authService := services.NewAuthService(authRepository, cacheService)
 	authHandler := handler.NewAuthHandler(authService)
 
+	cloudinaryUtils, err := utils.NewCloudinaryUtils()
+	if err != nil {
+		log.Fatalf("Failed to initialize Cloudinary: %v", err)
+	}
+
+	productRepository := repositories.NewProductRepository(db)
+	productService := services.NewProductService(productRepository, cloudinaryUtils)
+	productHandler := handler.NewProductHandler(productService)
+
 	server := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			middleware.ErrorMiddleware,
@@ -44,6 +55,7 @@ func main() {
 	)
 
 	auth.RegisterAuthServiceServer(server, authHandler)
+	product.RegisterProductServiceServer(server, productHandler)
 
 	if os.Getenv("ENVIRONMENT") == "dev" {
 		reflection.Register(server)

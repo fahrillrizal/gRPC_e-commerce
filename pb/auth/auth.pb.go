@@ -7,7 +7,7 @@
 package auth
 
 import (
-	_ "github.com/fahrillrizal/ecommerce-grpc/pb/buf/validate"
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	common "github.com/fahrillrizal/ecommerce-grpc/pb/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
