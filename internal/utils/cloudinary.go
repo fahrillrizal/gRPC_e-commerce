@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
@@ -13,6 +14,7 @@ import (
 type ICloudinaryUtils interface {
 	UploadImage(ctx context.Context, file io.Reader, filename string) (string, error)
 	DeleteImage(ctx context.Context, publicID string) error
+	ExtractPublicIDFromURL(imageURL string) string
 }
 
 type cloudinaryUtils struct {
@@ -44,7 +46,7 @@ func boolPtr(b bool) *bool {
 
 func (ch *cloudinaryUtils) UploadImage(ctx context.Context, file io.Reader, filename string) (string, error) {
 	uploadResult, err := ch.cld.Upload.Upload(ctx, file, uploader.UploadParams{
-		Folder:         "/",
+		Folder:         "products",
 		UniqueFilename: boolPtr(true),
 		Overwrite:      boolPtr(false),
 		ResourceType:   "image",
@@ -57,6 +59,10 @@ func (ch *cloudinaryUtils) UploadImage(ctx context.Context, file io.Reader, file
 }
 
 func (ch *cloudinaryUtils) DeleteImage(ctx context.Context, publicID string) error {
+	if publicID == "" {
+		return nil
+	}
+
 	_, err := ch.cld.Upload.Destroy(ctx, uploader.DestroyParams{
 		PublicID: publicID,
 	})
@@ -65,4 +71,38 @@ func (ch *cloudinaryUtils) DeleteImage(ctx context.Context, publicID string) err
 	}
 
 	return nil
+}
+
+func (ch *cloudinaryUtils) ExtractPublicIDFromURL(imageURL string) string {
+	if imageURL == "" {
+		return ""
+	}
+
+	if !strings.Contains(imageURL, "cloudinary.com") {
+		return ""
+	}
+
+	if strings.Contains(imageURL, "placeholder") {
+		return ""
+	}
+
+	parts := strings.Split(imageURL, "/upload/")
+	if len(parts) < 2 {
+		return ""
+	}
+
+	afterUpload := parts[1]
+
+	afterUpload = strings.TrimPrefix(afterUpload, "v")
+	slashIndex := strings.Index(afterUpload, "/")
+	if slashIndex > 0 {
+		afterUpload = afterUpload[slashIndex+1:]
+	}
+
+	lastDotIndex := strings.LastIndex(afterUpload, ".")
+	if lastDotIndex > 0 {
+		afterUpload = afterUpload[:lastDotIndex]
+	}
+
+	return afterUpload
 }

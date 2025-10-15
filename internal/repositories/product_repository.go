@@ -141,8 +141,10 @@ func (pr *productRepository) GetProductsPaginationAdmin(ctx context.Context, pag
 		perPage = 100
 	}
 
+	// ✅ FIX: Tambahkan filter is_deleted = false
 	err := pr.db.WithContext(ctx).
 		Model(&models.Product{}).
+		Where("is_deleted = ?", false).
 		Count(&totalItems).Error
 
 	if err != nil {
@@ -178,7 +180,9 @@ func (pr *productRepository) GetProductsPaginationAdmin(ctx context.Context, pag
 		}
 	}
 
+	// ✅ FIX: Tambahkan filter is_deleted = false
 	err = pr.db.WithContext(ctx).
+		Where("is_deleted = ?", false).
 		Order(sortClause).
 		Limit(int(perPage)).
 		Offset(int(offset)).

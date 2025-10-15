@@ -51,6 +51,8 @@ message UpdateProductRequest {
     string description = 3 [(buf.validate.field).string.max_len = 1000]; 
     double price = 4;
     string image_url = 5;
+    bytes image_data = 6;
+    string image_filename = 7;
 }
 
 message UpdateProductResponse {

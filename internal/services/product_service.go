@@ -138,8 +138,40 @@ func (ps *productService) UpdateProduct(ctx context.Context, req *product.Update
 		existingProduct.Price = req.Price
 	}
 
-	if req.ImageUrl != "" {
-		existingProduct.ImageURL = req.ImageUrl
+	imageURL := req.ImageUrl
+	oldImageURL := existingProduct.ImageURL
+
+	if len(req.ImageData) > 0 {
+		reader := bytes.NewReader(req.ImageData)
+
+		filename := req.ImageFilename
+		if filename == "" {
+			filename = existingProduct.Name
+		}
+
+		uploadedURL, err := ps.cloudinaryUtils.UploadImage(ctx, reader, filename)
+		if err != nil {
+			return nil, status.Error(codes.Internal, fmt.Sprintf("failed to upload new image: %v", err))
+		}
+		imageURL = uploadedURL
+
+		if oldImageURL != "" && oldImageURL != imageURL {
+			oldPublicID := ps.cloudinaryUtils.ExtractPublicIDFromURL(oldImageURL)
+			if oldPublicID != "" {
+
+				go func() {
+					deleteErr := ps.cloudinaryUtils.DeleteImage(context.Background(), oldPublicID)
+					if deleteErr != nil {
+
+						fmt.Printf("Warning: failed to delete old image %s: %v\n", oldPublicID, deleteErr)
+					}
+				}()
+			}
+		}
+	}
+
+	if imageURL != "" {
+		existingProduct.ImageURL = imageURL
 	}
 
 	existingProduct.UpdatedBy = &claims.FullName
@@ -177,6 +209,22 @@ func (ps *productService) DeleteProduct(ctx context.Context, req *product.Delete
 	err = ps.productRepository.DeleteProduct(ctx, existingProduct)
 	if err != nil {
 		return nil, status.Error(codes.Internal, fmt.Sprintf("failed to delete product: %v", err))
+	}
+
+	if existingProduct.ImageURL != "" {
+		publicID := ps.cloudinaryUtils.ExtractPublicIDFromURL(existingProduct.ImageURL)
+		if publicID != "" {
+
+			go func() {
+				deleteErr := ps.cloudinaryUtils.DeleteImage(context.Background(), publicID)
+				if deleteErr != nil {
+
+					fmt.Printf("Warning: failed to delete image %s from Cloudinary: %v\n", publicID, deleteErr)
+				} else {
+					fmt.Printf("Successfully deleted image %s from Cloudinary\n", publicID)
+				}
+			}()
+		}
 	}
 
 	return &product.DeleteProductResponse{
