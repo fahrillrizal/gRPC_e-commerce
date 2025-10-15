@@ -2,4 +2,3 @@ go*
 .env
 .env*
 .DS_Store
-buf*
