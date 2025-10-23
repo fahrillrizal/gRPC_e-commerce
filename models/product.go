@@ -8,3 +8,7 @@ type Product struct {
 	ImageURL    string  `gorm:"type:varchar(255)" json:"image_url"`
 	BaseModel
 }
+
+func init() {
+	RegisterModel(&Product{})
+}

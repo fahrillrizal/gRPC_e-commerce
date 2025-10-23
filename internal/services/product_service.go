@@ -182,8 +182,12 @@ func (ps *productService) UpdateProduct(ctx context.Context, req *product.Update
 	}
 
 	return &product.UpdateProductResponse{
-		Base: utils.SuccessResponse("Product updated successfully"),
-		Id:   uint64(existingProduct.ID),
+		Base:        utils.SuccessResponse("Product updated successfully"),
+		Id:          uint64(existingProduct.ID),
+		Name:        existingProduct.Name,
+		Description: existingProduct.Description,
+		Price:       existingProduct.Price,
+		ImageUrl:    existingProduct.ImageURL,
 	}, nil
 }
 

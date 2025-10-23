@@ -25,3 +25,7 @@ func (b *BaseModel) BeforeUpdate(tx *gorm.DB) error {
 	}
 	return nil
 }
+
+func (b *BaseModel) BeforeDelete(tx *gorm.DB) error {
+	return tx.Model(b).UpdateColumn("is_deleted", true).Error
+}

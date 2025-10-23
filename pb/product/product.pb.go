@@ -294,8 +294,8 @@ type UpdateProductRequest struct {
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	Price         float64                `protobuf:"fixed64,4,opt,name=price,proto3" json:"price,omitempty"`
 	ImageUrl      string                 `protobuf:"bytes,5,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
-	ImageData     []byte                 `protobuf:"bytes,6,opt,name=image_data,json=imageData,proto3" json:"image_data,omitempty"`             // ← ADDED
-	ImageFilename string                 `protobuf:"bytes,7,opt,name=image_filename,json=imageFilename,proto3" json:"image_filename,omitempty"` // ← ADDED
+	ImageData     []byte                 `protobuf:"bytes,6,opt,name=image_data,json=imageData,proto3" json:"image_data,omitempty"`
+	ImageFilename string                 `protobuf:"bytes,7,opt,name=image_filename,json=imageFilename,proto3" json:"image_filename,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -383,6 +383,10 @@ type UpdateProductResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Base          *common.BaseResponse   `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
 	Id            uint64                 `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	Price         float64                `protobuf:"fixed64,5,opt,name=price,proto3" json:"price,omitempty"`
+	ImageUrl      string                 `protobuf:"bytes,6,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -429,6 +433,34 @@ func (x *UpdateProductResponse) GetId() uint64 {
 		return x.Id
 	}
 	return 0
+}
+
+func (x *UpdateProductResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateProductResponse) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *UpdateProductResponse) GetPrice() float64 {
+	if x != nil {
+		return x.Price
+	}
+	return 0
+}
+
+func (x *UpdateProductResponse) GetImageUrl() string {
+	if x != nil {
+		return x.ImageUrl
+	}
+	return ""
 }
 
 type DeleteProductRequest struct {
@@ -1078,10 +1110,14 @@ const file_product_product_proto_rawDesc = "" +
 	"\timage_url\x18\x05 \x01(\tR\bimageUrl\x12\x1d\n" +
 	"\n" +
 	"image_data\x18\x06 \x01(\fR\timageData\x12%\n" +
-	"\x0eimage_filename\x18\a \x01(\tR\rimageFilename\"Q\n" +
+	"\x0eimage_filename\x18\a \x01(\tR\rimageFilename\"\xba\x01\n" +
 	"\x15UpdateProductResponse\x12(\n" +
 	"\x04base\x18\x01 \x01(\v2\x14.common.BaseResponseR\x04base\x12\x0e\n" +
-	"\x02id\x18\x02 \x01(\x04R\x02id\"&\n" +
+	"\x02id\x18\x02 \x01(\x04R\x02id\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x14\n" +
+	"\x05price\x18\x05 \x01(\x01R\x05price\x12\x1b\n" +
+	"\timage_url\x18\x06 \x01(\tR\bimageUrl\"&\n" +
 	"\x14DeleteProductRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\"A\n" +
 	"\x15DeleteProductResponse\x12(\n" +

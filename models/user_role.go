@@ -8,3 +8,7 @@ type UserRole struct {
     
     Users []User `gorm:"foreignKey:RoleID;constraint:OnDelete:SET NULL" json:"users,omitempty"`
 }
+
+func init() {
+	RegisterModel(&UserRole{})
+}

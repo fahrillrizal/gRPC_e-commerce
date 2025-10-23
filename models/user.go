@@ -9,3 +9,7 @@ type User struct {
 	BaseModel
 	Role *UserRole `gorm:"foreignKey:RoleID" json:"role,omitempty"`
 }
+
+func init() {
+	RegisterModel(&User{})
+}

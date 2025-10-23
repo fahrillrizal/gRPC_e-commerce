@@ -58,6 +58,10 @@ message UpdateProductRequest {
 message UpdateProductResponse {
     common.BaseResponse base = 1;
     uint64 id = 2;
+    string name = 3;
+    string description = 4;
+    double price = 5;
+    string image_url = 6;
 }
 
 message DeleteProductRequest {
