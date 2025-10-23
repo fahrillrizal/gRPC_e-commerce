@@ -25,8 +25,8 @@ const (
 
 type AddToCartRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ProductId     int64                  `protobuf:"varint,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
-	Quantity      int64                  `protobuf:"varint,2,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	ProductId     uint64                 `protobuf:"varint,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
+	Quantity      int32                  `protobuf:"varint,2,opt,name=quantity,proto3" json:"quantity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -61,14 +61,14 @@ func (*AddToCartRequest) Descriptor() ([]byte, []int) {
 	return file_cart_cart_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *AddToCartRequest) GetProductId() int64 {
+func (x *AddToCartRequest) GetProductId() uint64 {
 	if x != nil {
 		return x.ProductId
 	}
 	return 0
 }
 
-func (x *AddToCartRequest) GetQuantity() int64 {
+func (x *AddToCartRequest) GetQuantity() int32 {
 	if x != nil {
 		return x.Quantity
 	}
@@ -78,7 +78,7 @@ func (x *AddToCartRequest) GetQuantity() int64 {
 type AddToCartResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	BaseResponse  *common.BaseResponse   `protobuf:"bytes,1,opt,name=base_response,json=baseResponse,proto3" json:"base_response,omitempty"`
-	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	Id            uint64                 `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -120,11 +120,11 @@ func (x *AddToCartResponse) GetBaseResponse() *common.BaseResponse {
 	return nil
 }
 
-func (x *AddToCartResponse) GetId() string {
+func (x *AddToCartResponse) GetId() uint64 {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return 0
 }
 
 type ListCartRequest struct {
@@ -165,11 +165,12 @@ func (*ListCartRequest) Descriptor() ([]byte, []int) {
 
 type ListCartResponseItem struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	ProductId       int64                  `protobuf:"varint,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
-	ProductName     string                 `protobuf:"bytes,2,opt,name=product_name,json=productName,proto3" json:"product_name,omitempty"`
-	ProductImageUrl string                 `protobuf:"bytes,3,opt,name=product_image_url,json=productImageUrl,proto3" json:"product_image_url,omitempty"`
-	ProductPrice    float64                `protobuf:"fixed64,4,opt,name=product_price,json=productPrice,proto3" json:"product_price,omitempty"`
-	Quantity        int32                  `protobuf:"varint,5,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	CartId          uint64                 `protobuf:"varint,1,opt,name=cart_id,json=cartId,proto3" json:"cart_id,omitempty"`
+	ProductId       uint64                 `protobuf:"varint,2,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
+	ProductName     string                 `protobuf:"bytes,3,opt,name=product_name,json=productName,proto3" json:"product_name,omitempty"`
+	ProductImageUrl string                 `protobuf:"bytes,4,opt,name=product_image_url,json=productImageUrl,proto3" json:"product_image_url,omitempty"`
+	ProductPrice    float64                `protobuf:"fixed64,5,opt,name=product_price,json=productPrice,proto3" json:"product_price,omitempty"`
+	Quantity        int32                  `protobuf:"varint,6,opt,name=quantity,proto3" json:"quantity,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -204,7 +205,14 @@ func (*ListCartResponseItem) Descriptor() ([]byte, []int) {
 	return file_cart_cart_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *ListCartResponseItem) GetProductId() int64 {
+func (x *ListCartResponseItem) GetCartId() uint64 {
+	if x != nil {
+		return x.CartId
+	}
+	return 0
+}
+
+func (x *ListCartResponseItem) GetProductId() uint64 {
 	if x != nil {
 		return x.ProductId
 	}
@@ -293,7 +301,7 @@ func (x *ListCartResponse) GetItems() []*ListCartResponseItem {
 
 type DeleteCartRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CartId        string                 `protobuf:"bytes,1,opt,name=cart_id,json=cartId,proto3" json:"cart_id,omitempty"`
+	CartId        uint64                 `protobuf:"varint,1,opt,name=cart_id,json=cartId,proto3" json:"cart_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -328,11 +336,11 @@ func (*DeleteCartRequest) Descriptor() ([]byte, []int) {
 	return file_cart_cart_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *DeleteCartRequest) GetCartId() string {
+func (x *DeleteCartRequest) GetCartId() uint64 {
 	if x != nil {
 		return x.CartId
 	}
-	return ""
+	return 0
 }
 
 type DeleteCartResponse struct {
@@ -381,8 +389,8 @@ func (x *DeleteCartResponse) GetBaseResponse() *common.BaseResponse {
 
 type UpdateCartQtyRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CartId        string                 `protobuf:"bytes,1,opt,name=cart_id,json=cartId,proto3" json:"cart_id,omitempty"`
-	NewQuantity   int64                  `protobuf:"varint,2,opt,name=new_quantity,json=newQuantity,proto3" json:"new_quantity,omitempty"`
+	CartId        uint64                 `protobuf:"varint,1,opt,name=cart_id,json=cartId,proto3" json:"cart_id,omitempty"`
+	NewQuantity   int32                  `protobuf:"varint,2,opt,name=new_quantity,json=newQuantity,proto3" json:"new_quantity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -417,14 +425,14 @@ func (*UpdateCartQtyRequest) Descriptor() ([]byte, []int) {
 	return file_cart_cart_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *UpdateCartQtyRequest) GetCartId() string {
+func (x *UpdateCartQtyRequest) GetCartId() uint64 {
 	if x != nil {
 		return x.CartId
 	}
-	return ""
+	return 0
 }
 
-func (x *UpdateCartQtyRequest) GetNewQuantity() int64 {
+func (x *UpdateCartQtyRequest) GetNewQuantity() int32 {
 	if x != nil {
 		return x.NewQuantity
 	}
@@ -482,29 +490,30 @@ const file_cart_cart_proto_rawDesc = "" +
 	"\x0fcart/cart.proto\x12\x04cart\x1a\x1acommon/base_response.proto\x1a\x1bbuf/validate/validate.proto\"_\n" +
 	"\x10AddToCartRequest\x12&\n" +
 	"\n" +
-	"product_id\x18\x01 \x01(\x03B\a\xbaH\x04\"\x02 \x00R\tproductId\x12#\n" +
-	"\bquantity\x18\x02 \x01(\x03B\a\xbaH\x04\"\x02 \x00R\bquantity\"^\n" +
+	"product_id\x18\x01 \x01(\x04B\a\xbaH\x042\x02 \x00R\tproductId\x12#\n" +
+	"\bquantity\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02 \x00R\bquantity\"^\n" +
 	"\x11AddToCartResponse\x129\n" +
 	"\rbase_response\x18\x01 \x01(\v2\x14.common.BaseResponseR\fbaseResponse\x12\x0e\n" +
-	"\x02id\x18\x02 \x01(\tR\x02id\"\x11\n" +
-	"\x0fListCartRequest\"\xc5\x01\n" +
-	"\x14ListCartResponseItem\x12\x1d\n" +
+	"\x02id\x18\x02 \x01(\x04R\x02id\"\x11\n" +
+	"\x0fListCartRequest\"\xde\x01\n" +
+	"\x14ListCartResponseItem\x12\x17\n" +
+	"\acart_id\x18\x01 \x01(\x04R\x06cartId\x12\x1d\n" +
 	"\n" +
-	"product_id\x18\x01 \x01(\x03R\tproductId\x12!\n" +
-	"\fproduct_name\x18\x02 \x01(\tR\vproductName\x12*\n" +
-	"\x11product_image_url\x18\x03 \x01(\tR\x0fproductImageUrl\x12#\n" +
-	"\rproduct_price\x18\x04 \x01(\x01R\fproductPrice\x12\x1a\n" +
-	"\bquantity\x18\x05 \x01(\x05R\bquantity\"\x7f\n" +
+	"product_id\x18\x02 \x01(\x04R\tproductId\x12!\n" +
+	"\fproduct_name\x18\x03 \x01(\tR\vproductName\x12*\n" +
+	"\x11product_image_url\x18\x04 \x01(\tR\x0fproductImageUrl\x12#\n" +
+	"\rproduct_price\x18\x05 \x01(\x01R\fproductPrice\x12\x1a\n" +
+	"\bquantity\x18\x06 \x01(\x05R\bquantity\"\x7f\n" +
 	"\x10ListCartResponse\x129\n" +
 	"\rbase_response\x18\x01 \x01(\v2\x14.common.BaseResponseR\fbaseResponse\x120\n" +
 	"\x05items\x18\x02 \x03(\v2\x1a.cart.ListCartResponseItemR\x05items\"5\n" +
 	"\x11DeleteCartRequest\x12 \n" +
-	"\acart_id\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x06cartId\"O\n" +
+	"\acart_id\x18\x01 \x01(\x04B\a\xbaH\x042\x02 \x00R\x06cartId\"O\n" +
 	"\x12DeleteCartResponse\x129\n" +
 	"\rbase_response\x18\x01 \x01(\v2\x14.common.BaseResponseR\fbaseResponse\"d\n" +
 	"\x14UpdateCartQtyRequest\x12 \n" +
-	"\acart_id\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x06cartId\x12*\n" +
-	"\fnew_quantity\x18\x02 \x01(\x03B\a\xbaH\x04\"\x02(\x00R\vnewQuantity\"R\n" +
+	"\acart_id\x18\x01 \x01(\x04B\a\xbaH\x042\x02 \x00R\x06cartId\x12*\n" +
+	"\fnew_quantity\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\vnewQuantity\"R\n" +
 	"\x15UpdateCartQtyResponse\x129\n" +
 	"\rbase_response\x18\x01 \x01(\v2\x14.common.BaseResponseR\fbaseResponse2\x91\x02\n" +
 	"\vCartService\x12<\n" +

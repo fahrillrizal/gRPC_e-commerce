@@ -48,7 +48,7 @@ func (cs *cartService) AddToCart(ctx context.Context, req *cart.AddToCartRequest
 
 	if existingCart != nil {
 		now := time.Now()
-		existingCart.Quantity += 1
+		existingCart.Quantity += int(req.Quantity)
 		existingCart.UpdatedAt = &now
 		updatedBy := claims.FullName
 		existingCart.UpdatedBy = &updatedBy
@@ -60,7 +60,7 @@ func (cs *cartService) AddToCart(ctx context.Context, req *cart.AddToCartRequest
 
 		return &cart.AddToCartResponse{
 			BaseResponse: utils.SuccessResponse("Added to cart successfully"),
-			Id:           string(rune(existingCart.ID)),
+			Id:           uint64(existingCart.ID),
 		}, nil
 	}
 
@@ -81,7 +81,7 @@ func (cs *cartService) AddToCart(ctx context.Context, req *cart.AddToCartRequest
 
 	return &cart.AddToCartResponse{
 		BaseResponse: utils.SuccessResponse("Added to cart successfully"),
-		Id:           string(rune(newCart.ID)),
+		Id:           uint64(newCart.ID),
 	}, nil
 }
 
@@ -99,7 +99,8 @@ func (cs *cartService) ListCart(ctx context.Context, req *cart.ListCartRequest) 
 	var cartItems []*cart.ListCartResponseItem = make([]*cart.ListCartResponseItem, 0)
 	for _, cartItem := range carts {
 		item := &cart.ListCartResponseItem{
-			ProductId:       int64(cartItem.ProductID),
+			CartId:          uint64(cartItem.ID),
+			ProductId:       uint64(cartItem.ProductID),
 			ProductName:     cartItem.Product.Name,
 			ProductImageUrl: cartItem.Product.ImageURL,
 			ProductPrice:    cartItem.Product.Price,
@@ -120,7 +121,7 @@ func (cs *cartService) DeleteCart(ctx context.Context, req *cart.DeleteCartReque
 		return nil, status.Error(codes.Internal, "failed to get user info")
 	}
 
-	existingCart, err := cs.cartRepository.GetCartById(ctx, req.CartId)
+	existingCart, err := cs.cartRepository.GetCartById(ctx, uint(req.CartId))
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +138,7 @@ func (cs *cartService) DeleteCart(ctx context.Context, req *cart.DeleteCartReque
 		}, nil
 	}
 
-	err = cs.cartRepository.DeleteCart(ctx, req.CartId, claims.FullName)
+	err = cs.cartRepository.DeleteCart(ctx, uint(req.CartId), claims.FullName)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +154,7 @@ func (cs *cartService) UpdateCartQty(ctx context.Context, req *cart.UpdateCartQt
 		return nil, status.Error(codes.Internal, "failed to get user info")
 	}
 
-	existingCart, err := cs.cartRepository.GetCartById(ctx, req.CartId)
+	existingCart, err := cs.cartRepository.GetCartById(ctx, uint(req.CartId))
 	if err != nil {
 		return nil, err
 	}

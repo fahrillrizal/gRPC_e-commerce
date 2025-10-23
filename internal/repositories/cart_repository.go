@@ -13,8 +13,8 @@ type ICartRepository interface {
 	CreateNewCart(ctx context.Context, cart *models.Cart) error
 	UpdateCart(ctx context.Context, cart *models.Cart) error
 	GetListCart(ctx context.Context, userId uint) ([]*models.Cart, error)
-	GetCartById(ctx context.Context, cartId string) (*models.Cart, error)
-	DeleteCart(ctx context.Context, cartId string, deletedBy string) error
+	GetCartById(ctx context.Context, cartId uint) (*models.Cart, error)
+	DeleteCart(ctx context.Context, cartId uint, deletedBy string) error
 }
 
 func (cr *cartRepository) GetCartByProductUserID(ctx context.Context, productId uint, userId uint) (*models.Cart, error) {
@@ -68,7 +68,7 @@ func (cr *cartRepository) GetListCart(ctx context.Context, userId uint) ([]*mode
 	return carts, nil
 }
 
-func (cr *cartRepository) GetCartById(ctx context.Context, cartId string) (*models.Cart, error) {
+func (cr *cartRepository) GetCartById(ctx context.Context, cartId uint) (*models.Cart, error) {
 	var cart models.Cart
 	err := cr.db.WithContext(ctx).
 		Preload("Product").
@@ -86,7 +86,7 @@ func (cr *cartRepository) GetCartById(ctx context.Context, cartId string) (*mode
 	return &cart, nil
 }
 
-func (cr *cartRepository) DeleteCart(ctx context.Context, cartId string, deletedBy string) error {
+func (cr *cartRepository) DeleteCart(ctx context.Context, cartId uint, deletedBy string) error {
 	return cr.db.WithContext(ctx).
 		Model(&models.Cart{}).
 		Where("id = ?", cartId).
