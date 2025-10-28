@@ -242,7 +242,7 @@ func (os *orderService) ListOrderAdmin(ctx context.Context, req *order.ListOrder
 			Customer:   o.UserFullName,
 			StatusCode: o.OrderStatusCode,
 			Total:      o.Total,
-			CreatedAt:  nil,
+			CreatedAt:  utils.ConvertTimeToTimestamp(o.CreatedAt),
 			Products:   products,
 		})
 	}
@@ -284,7 +284,7 @@ func (os *orderService) ListOrder(ctx context.Context, req *order.ListOrderReque
 			Customer:         o.UserFullName,
 			StatusCode:       o.OrderStatusCode,
 			Total:            o.Total,
-			CreatedAt:        nil,
+			CreatedAt:        utils.ConvertTimeToTimestamp(o.CreatedAt),
 			Products:         products,
 			XenditInvoiceUrl: o.XenditInvoiceUrl,
 		})
@@ -334,9 +334,9 @@ func (os *orderService) DetailOrder(ctx context.Context, req *order.DetailOrderR
 		UserFullName:     orderEntity.UserFullName,
 		Address:          orderEntity.Address,
 		PhoneNumber:      orderEntity.PhoneNumber,
-		Notes:            0,
+		Notes:            orderEntity.Notes,
 		OrderStatusCode:  orderEntity.OrderStatusCode,
-		CreatedAt:        nil,
+		CreatedAt:        utils.ConvertTimeToTimestamp(orderEntity.CreatedAt),
 		XenditInvoiceUrl: orderEntity.XenditInvoiceUrl,
 		Items:            items,
 	}, nil

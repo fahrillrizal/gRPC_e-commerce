@@ -107,7 +107,7 @@ message DetailOrderResponse {
     string user_full_name = 4;
     string address = 5;
     string phone_number = 6;
-    double notes = 7;
+    string notes = 7;
     string order_status_code = 8;
     google.protobuf.Timestamp created_at = 9;
     string xendit_invoice_url = 10;

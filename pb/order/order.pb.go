@@ -860,7 +860,7 @@ type DetailOrderResponse struct {
 	UserFullName     string                     `protobuf:"bytes,4,opt,name=user_full_name,json=userFullName,proto3" json:"user_full_name,omitempty"`
 	Address          string                     `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
 	PhoneNumber      string                     `protobuf:"bytes,6,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`
-	Notes            float64                    `protobuf:"fixed64,7,opt,name=notes,proto3" json:"notes,omitempty"`
+	Notes            string                     `protobuf:"bytes,7,opt,name=notes,proto3" json:"notes,omitempty"`
 	OrderStatusCode  string                     `protobuf:"bytes,8,opt,name=order_status_code,json=orderStatusCode,proto3" json:"order_status_code,omitempty"`
 	CreatedAt        *timestamppb.Timestamp     `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	XenditInvoiceUrl string                     `protobuf:"bytes,10,opt,name=xendit_invoice_url,json=xenditInvoiceUrl,proto3" json:"xendit_invoice_url,omitempty"`
@@ -941,11 +941,11 @@ func (x *DetailOrderResponse) GetPhoneNumber() string {
 	return ""
 }
 
-func (x *DetailOrderResponse) GetNotes() float64 {
+func (x *DetailOrderResponse) GetNotes() string {
 	if x != nil {
 		return x.Notes
 	}
-	return 0
+	return ""
 }
 
 func (x *DetailOrderResponse) GetOrderStatusCode() string {
@@ -1156,7 +1156,7 @@ const file_order_order_proto_rawDesc = "" +
 	"\x0euser_full_name\x18\x04 \x01(\tR\fuserFullName\x12\x18\n" +
 	"\aaddress\x18\x05 \x01(\tR\aaddress\x12!\n" +
 	"\fphone_number\x18\x06 \x01(\tR\vphoneNumber\x12\x14\n" +
-	"\x05notes\x18\a \x01(\x01R\x05notes\x12*\n" +
+	"\x05notes\x18\a \x01(\tR\x05notes\x12*\n" +
 	"\x11order_status_code\x18\b \x01(\tR\x0forderStatusCode\x129\n" +
 	"\n" +
 	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12,\n" +
