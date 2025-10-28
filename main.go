@@ -58,7 +58,7 @@ func main() {
 	cartHandler := handler.NewCartHandler(cartService)
 
 	orderRepository := repositories.NewOrderRepository(db)
-	orderService := services.NewOrderService(orderRepository, productRepository)
+	orderService := services.NewOrderService(orderRepository, productRepository, cartRepository)
 	orderHandler := handler.NewOrderHandler(orderService)
 
 	server := grpc.NewServer(

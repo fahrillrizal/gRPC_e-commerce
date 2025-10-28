@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -15,7 +14,6 @@ type webhookHandler struct {
 }
 
 func (wh *webhookHandler) ReceiveInvoice(c *fiber.Ctx) error {
-	fmt.Println(string(c.Body()))
 	var req dto.XenditInvoiceRequest
 	err := c.BodyParser(&req)
 	if err != nil {

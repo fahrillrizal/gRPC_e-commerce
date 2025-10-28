@@ -24,6 +24,7 @@ func (cr *cartRepository) GetCartByProductUserID(ctx context.Context, productId 
 		Preload("Product").
 		Preload("User").
 		Where("product_id = ? AND user_id = ?", productId, userId).
+		Where("is_deleted = ?", false).
 		First(&cart).Error
 
 	if err != nil {

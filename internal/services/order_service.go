@@ -5,6 +5,7 @@ import (
 	"fmt"
 	stdos "os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/fahrillrizal/ecommerce-grpc/internal/repositories"
@@ -28,6 +29,7 @@ type IOrderService interface {
 type orderService struct {
 	orderRepository   repositories.IOrderRepository
 	productRepository repositories.IProductRepository
+	cartRepository    repositories.ICartRepository
 }
 
 func (os *orderService) CreateOrder(ctx context.Context, req *order.CreateOrderRequest) (*order.CreateOrderResponse, error) {
@@ -170,6 +172,22 @@ func (os *orderService) CreateOrder(ctx context.Context, req *order.CreateOrderR
 		if err != nil {
 			tx.Rollback()
 			return nil, err
+		}
+
+		// Delete cart item setelah order item berhasil dibuat
+		// Cari cart berdasarkan product_id dan user_id
+		cart, err := os.cartRepository.GetCartByProductUserID(ctx, uint(p.ProductId), claims.UserID)
+		if err != nil {
+			tx.Rollback()
+			return nil, status.Error(codes.Internal, "failed to get cart item")
+		}
+
+		if cart != nil {
+			err = os.cartRepository.DeleteCart(ctx, cart.ID, claims.FullName)
+			if err != nil {
+				tx.Rollback()
+				return nil, status.Error(codes.Internal, "failed to delete cart item")
+			}
 		}
 	}
 
@@ -348,18 +366,24 @@ func (os *orderService) UpdateOrderStatus(ctx context.Context, req *order.Update
 	}
 
 	currentStatus := orderEntity.OrderStatusCode
-	newStatus := req.NewStatusCode
+	// Convert newStatus to lowercase untuk konsistensi
+	newStatus := strings.ToLower(req.NewStatusCode)
 
 	allowedTransitions := map[string]map[string]bool{
 		models.OrderStatusCodeUnpaid: {
-			models.OrderStatusCodePaid:      true,
-			models.OrderStatusCodeCompleted: true,
+			models.OrderStatusCodePaid:     true,
+			models.OrderStatusCodeCanceled: true,
 		},
 		models.OrderStatusCodePaid: {
-			models.OrderStatusCodeShipped: true,
+			models.OrderStatusCodeShipped:  true,
+			models.OrderStatusCodeCanceled: true,
 		},
 		models.OrderStatusCodeShipped: {
 			models.OrderStatusCodeCompleted: true,
+			models.OrderStatusCodeDone:      true,
+		},
+		models.OrderStatusCodeCompleted: {
+			models.OrderStatusCodeDone: true,
 		},
 	}
 
@@ -367,23 +391,24 @@ func (os *orderService) UpdateOrderStatus(ctx context.Context, req *order.Update
 		return nil, status.Errorf(codes.InvalidArgument, "invalid status transition from %s to %s", currentStatus, newStatus)
 	}
 
-	switch {
-	case currentStatus == models.OrderStatusCodeUnpaid && newStatus == models.OrderStatusCodePaid:
-
+	// Validasi role-based permissions
+	switch newStatus {
+	case models.OrderStatusCodePaid:
 		if !isAdmin {
 			return nil, status.Error(codes.PermissionDenied, "only admin can mark order as paid")
 		}
-
-	case currentStatus == models.OrderStatusCodePaid && newStatus == models.OrderStatusCodeShipped:
-
+	case models.OrderStatusCodeShipped:
 		if !isAdmin {
 			return nil, status.Error(codes.PermissionDenied, "only admin can mark order as shipped")
 		}
-
-	case currentStatus == models.OrderStatusCodeUnpaid && newStatus == models.OrderStatusCodeCompleted:
-
-	case currentStatus == models.OrderStatusCodeShipped && newStatus == models.OrderStatusCodeCompleted:
-
+	case models.OrderStatusCodeCanceled:
+		// Both admin and customer can cancel order
+		if !isAdmin && !isOwner {
+			return nil, status.Error(codes.PermissionDenied, "you can only cancel your own orders")
+		}
+	case models.OrderStatusCodeCompleted, models.OrderStatusCodeDone:
+		// Customer can mark as completed/done when delivered
+		// Admin can also mark as completed/done
 	}
 
 	now := time.Now()
@@ -401,9 +426,10 @@ func (os *orderService) UpdateOrderStatus(ctx context.Context, req *order.Update
 	}, nil
 }
 
-func NewOrderService(orderRepository repositories.IOrderRepository, productRepository repositories.IProductRepository) IOrderService {
+func NewOrderService(orderRepository repositories.IOrderRepository, productRepository repositories.IProductRepository, cartRepository repositories.ICartRepository) IOrderService {
 	return &orderService{
 		orderRepository:   orderRepository,
 		productRepository: productRepository,
+		cartRepository:    cartRepository,
 	}
 }

@@ -19,7 +19,6 @@ type webhookService struct {
 }
 
 func (ws *webhookService) ReceiveInvoice(ctx context.Context, req *dto.XenditInvoiceRequest) error {
-	// Convert external ID (string) to uint
 	orderID, err := strconv.ParseUint(req.ExternalID, 10, 64)
 	if err != nil {
 		return errors.New("invalid external ID format")
