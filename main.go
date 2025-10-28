@@ -13,19 +13,24 @@ import (
 	"github.com/fahrillrizal/ecommerce-grpc/internal/utils"
 	"github.com/fahrillrizal/ecommerce-grpc/pb/auth"
 	"github.com/fahrillrizal/ecommerce-grpc/pb/cart"
+	"github.com/fahrillrizal/ecommerce-grpc/pb/order"
 	"github.com/fahrillrizal/ecommerce-grpc/pb/product"
 	"github.com/fahrillrizal/ecommerce-grpc/pkg/database"
 	"github.com/fahrillrizal/ecommerce-grpc/pkg/middleware"
+	"github.com/gofiber/fiber/v2"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/joho/godotenv"
 	gocache "github.com/patrickmn/go-cache"
 	"github.com/rs/cors"
+	"github.com/xendit/xendit-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
 func main() {
 	godotenv.Load()
+
+	xendit.Opt.SecretKey = os.Getenv("XENDIT_SECRET_KEY")
 
 	db, err := database.InitDB()
 	if err != nil {
@@ -52,6 +57,10 @@ func main() {
 	cartService := services.NewCartService(productRepository, cartRepository)
 	cartHandler := handler.NewCartHandler(cartService)
 
+	orderRepository := repositories.NewOrderRepository(db)
+	orderService := services.NewOrderService(orderRepository, productRepository)
+	orderHandler := handler.NewOrderHandler(orderService)
+
 	server := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			middleware.ErrorMiddleware,
@@ -62,6 +71,7 @@ func main() {
 	auth.RegisterAuthServiceServer(server, authHandler)
 	product.RegisterProductServiceServer(server, productHandler)
 	cart.RegisterCartServiceServer(server, cartHandler)
+	order.RegisterOrderServiceServer(server, orderHandler)
 
 	if os.Getenv("ENVIRONMENT") == "dev" {
 		reflection.Register(server)
@@ -129,6 +139,19 @@ func main() {
 		}
 	}()
 
+	// Setup Fiber untuk webhook
+	app := fiber.New()
+	webhookService := services.NewWebhookService(orderRepository)
+	webhookHandler := handler.NewWebhookHandler(webhookService)
+	app.Post("/webhook/xendit/invoice", webhookHandler.ReceiveInvoice)
+
+	go func() {
+		log.Println("Webhook server listening on :8081")
+		if err := app.Listen(":8081"); err != nil {
+			log.Panicf("error serving webhook server: %v", err)
+		}
+	}()
+
 	lis, err := net.Listen("tcp", ":3000")
 	if err != nil {
 		log.Panicf("error starting server: %v", err)
@@ -138,5 +161,4 @@ func main() {
 	if err := server.Serve(lis); err != nil {
 		log.Panicf("error serving gRPC server: %v", err)
 	}
-
 }

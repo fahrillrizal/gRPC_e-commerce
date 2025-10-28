@@ -59,6 +59,7 @@ func (cr *cartRepository) GetListCart(ctx context.Context, userId uint) ([]*mode
 		Preload("Product").
 		Preload("User").
 		Where("user_id = ?", userId).
+		Where("is_deleted = ?", false).
 		Find(&carts).Error
 
 	if err != nil {
@@ -74,6 +75,7 @@ func (cr *cartRepository) GetCartById(ctx context.Context, cartId uint) (*models
 		Preload("Product").
 		Preload("User").
 		Where("id = ?", cartId).
+		Where("is_deleted = ?", false).
 		First(&cart).Error
 
 	if err != nil {

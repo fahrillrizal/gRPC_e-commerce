@@ -12,6 +12,7 @@ import (
 
 type IProductRepository interface {
 	GetProductByID(ctx context.Context, id uint) (*models.Product, error)
+	GetProductsByIDs(ctx context.Context, ids []string) ([]*models.Product, error)
 	CreateProduct(ctx context.Context, product *models.Product) error
 	UpdateProduct(ctx context.Context, product *models.Product) error
 	DeleteProduct(ctx context.Context, product *models.Product) error
@@ -44,6 +45,22 @@ func (pr *productRepository) GetProductByID(ctx context.Context, id uint) (*mode
 	}
 
 	return &product, nil
+}
+
+func (pr *productRepository) GetProductsByIDs(ctx context.Context, ids []string) ([]*models.Product, error) {
+	var products []*models.Product
+
+	err := pr.db.WithContext(ctx).
+		Select("id", "name", "price", "image_url").
+		Where("id IN ?", ids).
+		Where("is_deleted = ?", false).
+		Find(&products).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return products, nil
 }
 
 func (pr *productRepository) UpdateProduct(ctx context.Context, product *models.Product) error {
