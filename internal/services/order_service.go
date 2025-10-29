@@ -11,6 +11,7 @@ import (
 	"github.com/fahrillrizal/ecommerce-grpc/internal/repositories"
 	"github.com/fahrillrizal/ecommerce-grpc/internal/utils"
 	"github.com/fahrillrizal/ecommerce-grpc/models"
+	"github.com/fahrillrizal/ecommerce-grpc/pb/common"
 	"github.com/fahrillrizal/ecommerce-grpc/pb/order"
 	"github.com/xendit/xendit-go"
 	"github.com/xendit/xendit-go/invoice"
@@ -174,8 +175,6 @@ func (os *orderService) CreateOrder(ctx context.Context, req *order.CreateOrderR
 			return nil, err
 		}
 
-		// Delete cart item setelah order item berhasil dibuat
-		// Cari cart berdasarkan product_id dan user_id
 		cart, err := os.cartRepository.GetCartByProductUserID(ctx, uint(p.ProductId), claims.UserID)
 		if err != nil {
 			tx.Rollback()
@@ -216,6 +215,13 @@ func (os *orderService) ListOrderAdmin(ctx context.Context, req *order.ListOrder
 
 	if claims.RoleCode != "ADMIN" {
 		return nil, status.Error(codes.PermissionDenied, "only admin can delete product")
+	}
+
+	if req.Pagination == nil {
+		req.Pagination = &common.PaginationRequest{
+			CurrentPage: 1,
+			PerPage:     10,
+		}
 	}
 
 	orders, metadata, err := os.orderRepository.GetListOrderAdmin(ctx, req.Pagination)
@@ -366,7 +372,7 @@ func (os *orderService) UpdateOrderStatus(ctx context.Context, req *order.Update
 	}
 
 	currentStatus := orderEntity.OrderStatusCode
-	// Convert newStatus to lowercase untuk konsistensi
+
 	newStatus := strings.ToLower(req.NewStatusCode)
 
 	allowedTransitions := map[string]map[string]bool{
@@ -391,7 +397,6 @@ func (os *orderService) UpdateOrderStatus(ctx context.Context, req *order.Update
 		return nil, status.Errorf(codes.InvalidArgument, "invalid status transition from %s to %s", currentStatus, newStatus)
 	}
 
-	// Validasi role-based permissions
 	switch newStatus {
 	case models.OrderStatusCodePaid:
 		if !isAdmin {
@@ -402,13 +407,12 @@ func (os *orderService) UpdateOrderStatus(ctx context.Context, req *order.Update
 			return nil, status.Error(codes.PermissionDenied, "only admin can mark order as shipped")
 		}
 	case models.OrderStatusCodeCanceled:
-		// Both admin and customer can cancel order
+
 		if !isAdmin && !isOwner {
 			return nil, status.Error(codes.PermissionDenied, "you can only cancel your own orders")
 		}
 	case models.OrderStatusCodeCompleted, models.OrderStatusCodeDone:
-		// Customer can mark as completed/done when delivered
-		// Admin can also mark as completed/done
+
 	}
 
 	now := time.Now()

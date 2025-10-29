@@ -87,6 +87,13 @@ func (or *orderRepository) GetListOrderAdmin(ctx context.Context, pagination *co
 	var orders []*models.Order
 	var totalItems int64
 
+	if pagination == nil {
+		pagination = &common.PaginationRequest{
+			CurrentPage: 1,
+			PerPage:     10,
+		}
+	}
+
 	page := pagination.CurrentPage
 	if page < 1 {
 		page = 1
@@ -142,6 +149,13 @@ func (or *orderRepository) GetListOrderAdmin(ctx context.Context, pagination *co
 func (or *orderRepository) GetListOrder(ctx context.Context, userID uint, pagination *common.PaginationRequest) ([]*models.Order, *common.PaginationResponse, error) {
 	var orders []*models.Order
 	var totalItems int64
+
+	if pagination == nil {
+		pagination = &common.PaginationRequest{
+			CurrentPage: 1,
+			PerPage:     10,
+		}
+	}
 
 	page := pagination.CurrentPage
 	if page < 1 {
