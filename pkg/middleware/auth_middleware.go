@@ -64,6 +64,7 @@ func (am *authMiddleware) isPublicEndpoint(method string) bool {
 		"/product.ProductService/ListProduct",
 		"/product.ProductService/DetailProduct",
 		"/product.ProductService/HighlightProducts",
+		"/newsletter.NewsletterService/Subscribe",
 	}
 
 	for _, endpoint := range publicEndpoints {
