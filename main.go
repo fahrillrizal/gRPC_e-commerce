@@ -13,6 +13,7 @@ import (
 	"github.com/fahrillrizal/ecommerce-grpc/internal/utils"
 	"github.com/fahrillrizal/ecommerce-grpc/pb/auth"
 	"github.com/fahrillrizal/ecommerce-grpc/pb/cart"
+	"github.com/fahrillrizal/ecommerce-grpc/pb/newsletter"
 	"github.com/fahrillrizal/ecommerce-grpc/pb/order"
 	"github.com/fahrillrizal/ecommerce-grpc/pb/product"
 	"github.com/fahrillrizal/ecommerce-grpc/pkg/database"
@@ -61,6 +62,10 @@ func main() {
 	orderService := services.NewOrderService(orderRepository, productRepository, cartRepository)
 	orderHandler := handler.NewOrderHandler(orderService)
 
+	newsletterRepository := repositories.NewNewsletterRepository(db)
+	newsletterService := services.NewNewsletterService(newsletterRepository)
+	newsletterHandler := handler.NewNewsletterHandler(newsletterService)
+
 	server := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			middleware.ErrorMiddleware,
@@ -72,6 +77,7 @@ func main() {
 	product.RegisterProductServiceServer(server, productHandler)
 	cart.RegisterCartServiceServer(server, cartHandler)
 	order.RegisterOrderServiceServer(server, orderHandler)
+	newsletter.RegisterNewsletterServiceServer(server, newsletterHandler)
 
 	if os.Getenv("ENVIRONMENT") == "dev" {
 		reflection.Register(server)

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package newsletter;
+
+import "common/base_response.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/fahrillrizal/ecommerce-grpc/pb/newsletter";
+
+service NewsletterService {
+  rpc Subscribe(SubscribeRequest) returns (SubscribeResponse);
+}
+
+message SubscribeRequest {
+  string email = 1[(buf.validate.field).string = {email: true, min_len: 5, max_len: 255}];
+  string name = 2[(buf.validate.field).string = {min_len: 1, max_len: 255}];
+}
+
+message SubscribeResponse {
+  common.BaseResponse base = 1;
+}
